@@ -1,8 +1,10 @@
 from fastapi import APIRouter
-from api import API_MAIN
+from fastapi.responses import JSONResponse
+from .api import API_MAIN
+from RPJAPI.character import Heroe
 
 CHARACTER = APIRouter(
-  prefix='/character',
+  prefix='/api/character',
   tags=['Personaje']
   )
 
@@ -10,4 +12,15 @@ CHARACTER = APIRouter(
 def getCharacter():
   pass
 
-API_MAIN.include_router(CHARACTER)
+@CHARACTER.post('/')
+def addCharacter(nombre : str):
+  nuevoPersonaje = Heroe(nombre)
+  return JSONResponse(nuevoPersonaje.__dict__,status_code=200)
+
+@CHARACTER.put('/')
+def updateCharacter():
+  pass
+
+@CHARACTER.delete('/')
+def deleteCharacter():
+  pass
