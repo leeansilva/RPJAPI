@@ -8,6 +8,5 @@ app.include_router(CHARACTER)
 def main():
   return "Hola RPJAPI"
 
-
 if __name__ =='__main__':
   uvicorn.run('main:app', reload=True)  

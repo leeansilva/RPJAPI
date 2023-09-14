@@ -1,129 +1,89 @@
-from abc import ABC, abstractmethod,ABCMeta
-import json
-class Personaje(metaclass=ABCMeta):
-
+from pydantic import BaseModel
+from random import randint,random, choice
+import time
+class Character(BaseModel):
   nombre : str
-  
-  vida : int = 50
-  agilidad : int = 50
-  aguante : int = 50
-  fuerza : int = 50
-  destreza : int = 50
-  magia : int = 50
-
+  vida : int = 100
   ataque : int = 50
-  defensa : int = 50
-
-  nivel : int = 1
+  defensa : int = 20
+  resistencia : int = 50
   experiencia : int = 0
 
-  @abstractmethod
-  def esquivar(self):
-    print(f'{self.nombre} a esquivado')
+  posicionDefensiva : int = 0
 
-  @abstractmethod
-  def atacar(self):
-    print(f'{self.nombre} a atacado')
+  @property
+  def vida(self):
+    self.vida
 
-  @abstractmethod
-  def defender(self):
-    print(f'{self.nombre} se a defendido')
+  @vida.setter
+  def vida(self,nuevaVida):
+    self.vida = nuevaVida
+    print(f'Se ha cambiado los puntos de vida : {self.vida}')
 
-  @abstractmethod
-  def curarse(self):
-    print(f'{self.nombre} se a curado')
-
-  @abstractmethod
-  def investigar(self):
-    print(f'{self.nombre} a investigado')
-
-
-class Heroe(Personaje):
-  def __init__(self, nombre):
-    self.nombre = nombre
-    self.vida : int = 70
-    self.agilidad : int = 40
-    self.aguante : int = 50
-    self.fuerza : int = 70
-    self.destreza : int = 50
-    self.magia : int = 20
-
-    self.ataque : int = 60
-    self.defensa : int = 50
-
-    self.nivel : int = 1
-    self.experiencia : int = 0
+  def atacar(self,enemigo):
+    self.posicionDefensiva = 0
+    ataqueMax = self.ataque + 10
+    ataqueMin = self.ataque - 10
+    ataquerandom = randint(ataqueMin,ataqueMax)
+    enemigo.vida = enemigo.vida - (ataquerandom - enemigo.posicionDefensiva)
+    print(f'{self.nombre} (+{ataquerandom} Atk) ha atacado a {enemigo.nombre} (+{enemigo.posicionDefensiva} Def), atacado con: -{ataquerandom - enemigo.posicionDefensiva}, vida restante: {enemigo.vida}') 
+        
+  def defenderse(self):
+    defMax = self.defensa + 5
+    defMin = self.defensa - 10
+    self.posicionDefensiva = randint(defMin,defMax)
+    print(f'{self.nombre} se puso en posicion defensiva: +{self.posicionDefensiva} Def')
 
   def esquivar(self):
-    return super().esquivar()
+    return "Esquivando.."
 
-  def atacar(self):
-    return super().atacar()
+  def explorar(self):
+    xpWin = randint(50, 500)
+    self.experiencia += xpWin
+    return f"""¡Ganaste +{xpWin} xp! /n
+              Puntos actuales de experiencia: {self.experiencia}"""
 
-  def defender(self):
-    return super().defender()
+class Fight(BaseModel):
+  player1 : Character
+  player2 : Character
 
-  def curarse(self):
-    return super().curarse()
+  def intencion(self,turnoPlayer, enemigo):
+    intenciones = {
+      'atacar': turnoPlayer.atacar,
+      'defender': turnoPlayer.defenderse
+      }
 
-  def investigar(self):
-    return super().investigar()
+    print(choice(list(intenciones.values())))
+    accion, metodo = choice(list())
+    if accion == 'atacar':
+      metodo(enemigo)
+    else :
+      metodo()
 
-class Bandido(Personaje):
-  def __init__(self):
-    print(self.vida)
-
-  def esquivar(self):
-    pass
-
-  def atacar(self):
-    pass
-
-  def defender(self):
-    pass
-
-  def curarse(self):
-    pass
-
-  def investigar(self):
-    pass
-
-class Mago(Personaje):
-  def __init__(self):
-    print(self.vida)
-
-  def esquivar(self):
-    pass
-
-  def atacar(self):
-    pass
-
-  def defender(self):
-    pass
-
-  def curarse(self):
-    pass
-
-  def investigar(self):
-    pass    
-
-class Guerrero(Personaje):
-  def __init__(self):
-    print(self.vida)
-
-  def esquivar(self):
-    return super().esquivar()
-
-  def atacar(self):
-    return super().atacar()
-
-  def defender(self):
-    pass
-
-  def curarse(self):
-    pass
-
-  def investigar(self):
-    pass   
+  
+  def pelear(self):
+    
+    self.intencion(self.player1, self.player2)
+    self.intencion(self.player2, self.player1)
+    time.sleep(3)
+    
+    self.intencion(self.player1, self.player2)
+    self.intencion(self.player2, self.player1)
+    time.sleep(3)
+    
+    self.intencion(self.player1, self.player2)
+    self.intencion(self.player2, self.player1)
+    time.sleep(3)
+    
+    self.intencion(self.player1, self.player2)
+    self.intencion(self.player2, self.player1)
+    time.sleep(3)
+    
 
 
+
+luchador = Character(nombre="Leandro",vida= 100)
+guerrero = Character(nombre="Waskas",vida= 100)
+
+pelea1 = Fight(player1=luchador, player2=guerrero)
+pelea1.pelear()
